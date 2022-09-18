@@ -1,0 +1,17 @@
+services:
+  prometheus:
+    image: bitnami/prometheus
+    volumes:
+      - prometheus_data:/home/prometheus/data
+    network_mode: host
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - ./grafana/config.monitoring
+    network_mode: host
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
