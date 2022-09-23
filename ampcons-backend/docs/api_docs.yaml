@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Ampcons
+  version: 0.0.1
+
+externalDocs:
+  description: Github
+  url: https://github.com/MatheusTomazella/ampcons-service
+
+tags:
+  - name: Data
+    description: Read and write measurements of a component
+
+paths:
+  /data:
+    post:
+      tags:
+        - Data
+      summary: Insert a new measurement in the database for a component.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RawMeasurement'
+        required: true
+      responses:
+        '200':
+          description: Data inserted in the database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Measurement'
+
+components:
+  schemas:
+    RawMeasurement:
+      type: object
+      properties:
+        tension: 
+          type: integer
+          description: Tension in volts (V)
+          example: 127
+        current: 
+          type: float
+          description: Current in amperes (A)
+          example: 2.6
+    Measurement:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        tension: 
+          type: integer
+          description: Tension in volts (V)
+          example: 127
+        current: 
+          type: float
+          description: Current in amperes (A)
+          example: 2.6
+        power:
+          type: float
+          description: Power in watts (W)
+          example: 330.2

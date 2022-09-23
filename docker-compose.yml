@@ -12,6 +12,9 @@ services:
     env_file:
       - ./grafana/config.monitoring
     network_mode: host
+  ampcons-api:
+    build: ./ampcons-backend
+    network_mode: host
 volumes:
   prometheus_data: {}
   grafana_data: {}

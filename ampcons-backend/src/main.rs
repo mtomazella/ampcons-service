@@ -1,17 +1,35 @@
+mod data;
+mod routes;
 mod utils;
 
-use rocket::response::status::Custom;
-use utils::responses::success_response;
+use axum::{extract::Query, http::StatusCode, response::IntoResponse, routing::get, Router};
+use serde::Deserialize;
+use std::net::SocketAddr;
 
-#[macro_use]
-extern crate rocket;
+use routes::measurement;
 
-#[get("/ping")]
-fn index() -> Custom<String> {
-    success_response()
+#[tokio::main]
+async fn main() {
+    tracing_subscriber::fmt::init();
+    let app = Router::new()
+        .route("/ping", get(ping))
+        .nest("/measurement", measurement::get_router());
+
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
+    tracing::info!("listening on {}", addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build().mount("/", routes![index])
+#[derive(Deserialize)]
+struct PingQuery {
+    message: Option<String>,
+}
+async fn ping(Query(params): Query<PingQuery>) -> impl IntoResponse {
+    (
+        StatusCode::OK,
+        to_json!({ "connection": true, "message": params.message }),
+    )
 }
