@@ -1,20 +1,24 @@
 services:
-  prometheus:
-    image: bitnami/prometheus
+  influxdb:
+    image: influxdb
     volumes:
-      - prometheus_data:/home/prometheus/data
+      - influxdb_data:/var/lib/influxdb
     network_mode: host
+    env_file:
+      - ./.env
   grafana:
     image: grafana/grafana
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     env_file:
-      - ./grafana/config.monitoring
+      - ./.env
     network_mode: host
   ampcons-api:
     build: ./ampcons-backend
     network_mode: host
+    env_file:
+      - ./.env
 volumes:
-  prometheus_data: {}
+  influxdb_data: {}
   grafana_data: {}
