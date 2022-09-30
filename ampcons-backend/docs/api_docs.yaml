@@ -8,14 +8,14 @@ externalDocs:
   url: https://github.com/MatheusTomazella/ampcons-service
 
 tags:
-  - name: Data
+  - name: Measurements
     description: Read and write measurements of a component
 
 paths:
-  /data:
+  /measurement:
     post:
       tags:
-        - Data
+        - Measurements
       summary: Insert a new measurement in the database for a component.
       requestBody:
         content:
@@ -30,6 +30,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Measurement'
+        '400':
+          description: The body is missing a required field.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error_MissingInformation'
 
 components:
   schemas:
@@ -41,9 +47,13 @@ components:
           description: Tension in volts (V)
           example: 127
         current: 
-          type: float
+          type: number
           description: Current in amperes (A)
           example: 2.6
+        comp_id:
+          type: string
+          description: Component uuid
+          example: u4g67fvyitg346c7fyj34gf7
     Measurement:
       type: object
       properties:
@@ -55,10 +65,21 @@ components:
           description: Tension in volts (V)
           example: 127
         current: 
-          type: float
+          type: number
           description: Current in amperes (A)
           example: 2.6
         power:
-          type: float
+          type: number
           description: Power in watts (W)
           example: 330.2
+        comp_id:
+          type: string
+          description: Component uuid
+          example: u4g67fvyitg346c7fyj34gf7
+
+    Error_MissingInformation:
+        type: object
+        properties:
+          missing_field:
+            type: string
+            example: comp_id
