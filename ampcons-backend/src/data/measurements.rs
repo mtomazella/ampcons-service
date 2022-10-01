@@ -1,7 +1,6 @@
 use crate::database;
 use chrono::Utc;
-use influxdb::InfluxDbWriteable;
-use influxdb::{Error, Timestamp};
+use influxdb_rs::{Error, Point};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -11,7 +10,7 @@ pub struct RawMeasurement {
     comp_id: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Measurement {
     time: i64,
     tension: f64,
@@ -31,30 +30,16 @@ impl From<RawMeasurement> for Measurement {
     }
 }
 impl Measurement {
-    pub async fn write(self) -> Result<String, Error> {
-        let data_point = MeasurementDataPoint::from(self);
-        let query = data_point.into_query("measurement");
-        database::influxdb::write(query).await
+    pub fn to_data_point(self) -> Point<'static> {
+        Point::new("measurement")
+            .add_timestamp(self.time)
+            .add_field("tension", self.tension)
+            .add_field("current", self.current)
+            .add_field("power", self.power)
+            .add_tag("comp_id", self.comp_id)
     }
-}
 
-#[derive(InfluxDbWriteable)]
-pub struct MeasurementDataPoint {
-    time: Timestamp,
-    tension: f64,
-    current: f64,
-    power: f64,
-    #[influxdb(tag)]
-    comp_id: String,
-}
-impl From<Measurement> for MeasurementDataPoint {
-    fn from(measurement: Measurement) -> MeasurementDataPoint {
-        MeasurementDataPoint {
-            time: (Timestamp::Milliseconds(measurement.time as u128)),
-            tension: (measurement.tension),
-            current: (measurement.current),
-            power: (measurement.power),
-            comp_id: (measurement.comp_id),
-        }
+    pub async fn write(self) -> Result<(), Error> {
+        database::influxdb::write(self.to_data_point()).await
     }
 }

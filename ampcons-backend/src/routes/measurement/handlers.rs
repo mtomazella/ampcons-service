@@ -8,10 +8,9 @@ use crate::{
 
 pub async fn insert_measurement(Json(params): Json<RawMeasurement>) -> impl IntoResponse {
     let measurement = Measurement::from(params);
-    let result = measurement.write().await;
+    let result = measurement.clone().write().await;
     if result.is_ok() {
-        println!("{:?}", result.unwrap());
-        (StatusCode::OK, to_json!({}))
+        (StatusCode::OK, to_json!(measurement))
     } else {
         get_response_for_influxdb_error(result.unwrap_err())
     }
