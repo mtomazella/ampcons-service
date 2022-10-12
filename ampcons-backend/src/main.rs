@@ -5,7 +5,6 @@ mod utils;
 
 use axum::{extract::Query, http::StatusCode, response::IntoResponse, routing::get, Router};
 use serde::Deserialize;
-use std::net::SocketAddr;
 
 use routes::measurement;
 
@@ -16,12 +15,12 @@ async fn main() {
         .route("/ping", get(ping))
         .nest("/measurement", measurement::get_router());
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
-    tracing::info!("listening on {}", addr);
-    axum::Server::bind(&addr)
+    axum::Server::bind(&"192.168.15.7:3001".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
+
+    tracing::info!("listening on 3001");
 }
 
 #[derive(Deserialize)]

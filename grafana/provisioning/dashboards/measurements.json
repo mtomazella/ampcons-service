@@ -1,0 +1,315 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "gVO3VQ7Vz"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "current"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "amp"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "tension"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "volt"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "cost"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyBRL"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "calcs": ["lastNotNull"],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "gVO3VQ7Vz"
+          },
+          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"current\")\n",
+          "refId": "current"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "gVO3VQ7Vz"
+          },
+          "hide": false,
+          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"tension\")\n",
+          "refId": "tension"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "gVO3VQ7Vz"
+          },
+          "hide": false,
+          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n",
+          "refId": "power"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "gVO3VQ7Vz"
+          },
+          "hide": false,
+          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n|> mean()\n|> yield(name: \"_results\")",
+          "refId": "cost"
+        }
+      ],
+      "title": "Measurements",
+      "transformations": [],
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "gVO3VQ7Vz"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "9.1.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "gVO3VQ7Vz"
+          },
+          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n|> timedMovingAverage(every: 1h, period: 1h)",
+          "refId": "avg_cons_hour"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "gVO3VQ7Vz"
+          },
+          "hide": false,
+          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n|> timedMovingAverage(every: 1h, period: 1h)\n|> map(fn: (r) => ({r with _value: r._value * 0.92}))",
+          "refId": "cost_by_hour"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "gVO3VQ7Vz"
+          },
+          "hide": false,
+          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n|> timedMovingAverage(every: 1h, period: 1h)\n|> map(fn: (r) => ({r with _value: r._value * 0.92}))\n|> cumulativeSum()",
+          "refId": "cost_sum"
+        }
+      ],
+      "title": "Cost",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 37,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2022-10-01T22:46:16.174Z",
+    "to": "2022-10-01T22:46:41.804Z"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Measurements",
+  "uid": "oqCDLt4Vk",
+  "version": 3,
+  "weekStart": ""
+}
