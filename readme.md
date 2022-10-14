@@ -8,6 +8,6 @@
 1. Run ```docker-compose up```
 
 If successful, you should have:
-- Prometheus running in port 9090
+- InfluxDB running in port 8086
 - Grafana running in port 3000 with the datasources and dashboards available
-- (TODO) The API running in port 3001
+- The API running in port 3001
