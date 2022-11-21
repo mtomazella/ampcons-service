@@ -15,7 +15,7 @@ async fn main() {
         .route("/ping", get(ping))
         .nest("/measurement", measurement::get_router());
 
-    axum::Server::bind(&"192.168.15.7:3001".parse().unwrap())
+    axum::Server::bind(&"192.168.0.11:3001".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();

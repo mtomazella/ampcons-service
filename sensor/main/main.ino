@@ -10,12 +10,12 @@ WiFiMulti wifiMulti;
 const int   AMP_SENSOR_PIN          = 34;
 
 // WIFI
-const char* NETWORK_SSID            = "A";
-const char* NETWORK_PASSWORD        = "A216191310";
-const char* MEASUREMENTS_API_URL    = "http://192.168.15.7:3001/measurement";
+const char* NETWORK_SSID            = "AMPCONS";
+const char* NETWORK_PASSWORD        = "aaaaaaaa";
+const char* MEASUREMENTS_API_URL    = "http://192.168.0.11:3001/measurement";
 
 // SENSORS
-const int   READINGS_PER_DATA_POINT     = 10;
+const int   READINGS_PER_DATA_POINT     = 50;
 const int   MS_BETWEEN_SAMPLES          = 50;
   // CURRENT
 const float AMPS_PER_ANALOG_POINT       = 0.00137844612;
@@ -41,6 +41,7 @@ float getMockSample (float baseline, float maxVariation) {
 
 float getCorrectedSample (int pin, float correction) {
   float reading = (float) analogRead(pin);
+  //Serial.println(reading);
   if (reading == 0) return 0;
   return reading + correction;
 }
@@ -49,10 +50,11 @@ DataPoint sampleDataPoint () {
   DataPoint data;
   for (int i = 0; i < READINGS_PER_DATA_POINT; i++) {
     data.current += getCorrectedSample(AMP_SENSOR_PIN, CURRENT_ERROR_COMPENSATION);
-    data.tension += getMockSample(127, 20);
+    data.tension += 120.0;
     delay(MS_BETWEEN_SAMPLES);
   }
   data.current = data.current / (float) READINGS_PER_DATA_POINT * AMPS_PER_ANALOG_POINT;
+  data.current = data.current -0.0923*data.current + 0.0775;
   data.tension = data.tension / (float) READINGS_PER_DATA_POINT * VOLTS_PER_ANALOG_POINT;
   return data;
 }
@@ -85,5 +87,5 @@ void printDataPoint (DataPoint data) {
 void loop() {
   DataPoint data = sampleDataPoint();
   printDataPoint(data);
-  postDataPoint(data);
+  //postDataPoint(data);
 }
