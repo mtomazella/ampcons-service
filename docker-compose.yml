@@ -2,7 +2,7 @@ services:
   influxdb:
     image: influxdb
     volumes:
-      - influxdb_data:/var/lib/influxdb
+      - influxdb_data:/var/lib/influxdb2
     network_mode: host
     env_file:
       - ./.env

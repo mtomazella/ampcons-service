@@ -24,177 +24,10 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "liveNow": false,
   "panels": [
-    {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "gVO3VQ7Vz"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "yellow",
-            "mode": "fixed"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "displayName": "Custo",
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "yellow",
-                "value": null
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 19,
-        "x": 0,
-        "y": 0
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "9.1.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "gVO3VQ7Vz"
-          },
-          "hide": true,
-          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n|> timedMovingAverage(every: 1h, period: 1h)\n|> cumulativeSum()",
-          "refId": "avg_cons_hour"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "gVO3VQ7Vz"
-          },
-          "hide": true,
-          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n|> timedMovingAverage(every: 1h, period: 1h)\n|> map(fn: (r) => ({r with _value: r._value * 0.000594}))",
-          "refId": "cost_by_hour"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "gVO3VQ7Vz"
-          },
-          "hide": false,
-          "query": "from(bucket: \"measurements\")\n|> range(start: -2y)\n|> filter(fn: (r) => r._field == \"power\")\n|> timedMovingAverage(every: 1h, period: 1h)\n|> map(fn: (r) => ({r with _value: r._value * 0.00592}))\n|> cumulativeSum()",
-          "refId": "cost_sum"
-        }
-      ],
-      "title": "Custo",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "datasource",
-        "uid": "-- Dashboard --"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "fixedColor": "yellow",
-            "mode": "fixed"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "currencyBRL"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 9,
-        "w": 5,
-        "x": 19,
-        "y": 0
-      },
-      "id": 6,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["last"],
-          "fields": "/^power 1$/",
-          "values": false
-        },
-        "text": {},
-        "textMode": "value"
-      },
-      "pluginVersion": "9.1.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "datasource",
-            "uid": "-- Dashboard --"
-          },
-          "panelId": 4,
-          "refId": "A"
-        }
-      ],
-      "title": "Custo",
-      "type": "stat"
-    },
     {
       "datasource": {
         "type": "influxdb",
@@ -342,10 +175,10 @@
         ]
       },
       "gridPos": {
-        "h": 13,
+        "h": 22,
         "w": 19,
         "x": 0,
-        "y": 9
+        "y": 0
       },
       "id": 2,
       "options": {
@@ -367,7 +200,7 @@
             "uid": "gVO3VQ7Vz"
           },
           "hide": false,
-          "query": "from(bucket: \"measurements\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn: (r) => r._field == \"current\")\n|> aggregateWindow(every: $__period, fn: mean)\n",
+          "query": "from(bucket: \"measurements\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn: (r) => r._field == \"current\")\n",
           "refId": "current"
         },
         {
@@ -376,7 +209,7 @@
             "uid": "gVO3VQ7Vz"
           },
           "hide": false,
-          "query": "from(bucket: \"measurements\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn: (r) => r._field == \"tension\")\n|> aggregateWindow(every: $__period, fn: mean)\n",
+          "query": "from(bucket: \"measurements\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn: (r) => r._field == \"tension\")\n",
           "refId": "tension"
         },
         {
@@ -385,7 +218,7 @@
             "uid": "gVO3VQ7Vz"
           },
           "hide": false,
-          "query": "from(bucket: \"measurements\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn: (r) => r._field == \"power\")\n|> aggregateWindow(every: $__period, fn: mean)\n",
+          "query": "from(bucket: \"measurements\")\n|> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n|> filter(fn: (r) => r._field == \"power\")\n",
           "refId": "power"
         }
       ],
@@ -417,10 +250,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 7,
         "w": 5,
         "x": 19,
-        "y": 9
+        "y": 0
       },
       "id": 9,
       "options": {
@@ -475,10 +308,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 7,
         "w": 5,
         "x": 19,
-        "y": 13
+        "y": 7
       },
       "id": 7,
       "options": {
@@ -533,10 +366,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 5,
+        "h": 8,
         "w": 5,
         "x": 19,
-        "y": 17
+        "y": 14
       },
       "id": 8,
       "options": {
@@ -575,13 +408,13 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Measurements",
-  "uid": "oqCDLt4Vk",
-  "version": 9,
+  "title": "Measurements Precise",
+  "uid": "FfspMWKVk",
+  "version": 2,
   "weekStart": ""
 }
