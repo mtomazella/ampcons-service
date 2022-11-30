@@ -16,7 +16,7 @@ const char* MEASUREMENTS_API_URL    = "http://192.168.0.11:3001/measurement";
 
 // SENSORS
 const int   READINGS_PER_DATA_POINT     = 50;
-const int   MS_BETWEEN_SAMPLES          = 50;
+const int   MS_BETWEEN_SAMPLES          = 1200;
   // CURRENT
   const float CURRENT_ERROR_COMP_FOR_READING = 158.2139394; // Média da diferença entre pontos esperados e coletados na análise 1 (E-C)
   const float AMPS_PER_ANALOG_POINT          = 0.00124; // Análise 1 Corrente e Pontos esperados trend ("a" term)
