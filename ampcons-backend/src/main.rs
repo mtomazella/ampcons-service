@@ -13,9 +13,9 @@ async fn main() {
     tracing_subscriber::fmt::init();
     let app = Router::new()
         .route("/ping", get(ping))
-        .nest("/measurement", measurement::get_router());
+        .nest("/stats", measurement::get_router());
 
-    axum::Server::bind(&"192.168.0.11:3001".parse().unwrap())
+    axum::Server::bind(&"0.0.0.0:3001".parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();

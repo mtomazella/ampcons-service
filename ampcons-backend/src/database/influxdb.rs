@@ -1,4 +1,8 @@
-use influxdb_rs::{reqwest::Url, Client, Error, Point, Precision};
+use influxdb_rs::{
+    data_model::query::ReadQuery,
+    reqwest::{Response, Url},
+    Client, Error, Point, Precision,
+};
 use std::env::var;
 
 async fn get_client() -> Result<Client, Error> {
@@ -31,10 +35,10 @@ pub async fn write(point: Point<'static>) -> Result<(), Error> {
         .await
 }
 
-// pub async fn read() -> Result<_, Error> {
-//     let client = get_client().await;
-//     if client.is_err() {
-//         return Err(client.unwrap_err());
-//     }
-//     client.unwrap().query()
-// }
+pub async fn read(query: ReadQuery) -> Result<Response, Error> {
+    let client = get_client().await;
+    if client.is_err() {
+        return Err(client.unwrap_err());
+    }
+    client.unwrap().query(Option::Some(query)).await
+}
