@@ -26,3 +26,10 @@ export const BadRequest = (response: Response, message?: string) => {
     json: { message: message ?? 'Request parameters were invalid' },
   })
 }
+
+export const InternalServerError = (response: Response, error?: any) => {
+  return buildResponse(response, {
+    status: 400,
+    json: error ?? { message: 'An unknown error occurred' },
+  })
+}

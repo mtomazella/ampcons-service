@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { validateParameters } from '../../utils/validate_parameters'
-import { BadRequest, Created, Success } from '../../utils/response_builder'
+import { BadRequest, Created } from '../../utils/response_builder'
 import { buildMissingParamErrorString } from '../../utils/string_builders'
 import { pick } from 'lodash'
 import { Measurement } from '../../data/measurement'

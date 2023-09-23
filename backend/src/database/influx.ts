@@ -1,4 +1,9 @@
-import { InfluxDB, Point } from '@influxdata/influxdb-client'
+import {
+  InfluxDB,
+  ParameterizedQuery,
+  Point,
+  flux,
+} from '@influxdata/influxdb-client'
 import { globalConfig } from '../config'
 
 const getInstance = () => {
@@ -18,4 +23,14 @@ export const write = async (point: Point) => {
   writeApi.writePoint(point)
 
   await writeApi.close()
+}
+
+export const query = async (query: string) => {
+  const queryApi = getInstance().getQueryApi(globalConfig.BE_INFLUXDB_ORG)
+
+  const result = await queryApi
+    .collectRows(query)
+    .catch(error => console.error(error))
+
+  return result
 }
