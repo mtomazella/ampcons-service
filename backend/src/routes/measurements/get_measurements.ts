@@ -2,7 +2,6 @@ import { Request, Response } from 'express'
 import { validateParameters } from '../../utils/validate_parameters'
 import {
   BadRequest,
-  Created,
   InternalServerError,
   Success,
 } from '../../utils/response_builder'

@@ -4,16 +4,21 @@ type ResponseBody = Record<string, any>
 
 const buildResponse = (
   response: Response,
-  { status, json }: { status: number; json: ResponseBody },
+  { status, json }: { status: number; json?: ResponseBody },
 ) => {
   response.statusCode = status ?? 500
   if (json) response.json(json)
+  else response.end()
 
   return response
 }
 
 export const Success = (response: Response, data: ResponseBody) => {
   return buildResponse(response, { status: 200, json: data })
+}
+
+export const NoContent = (response: Response) => {
+  return buildResponse(response, { status: 204 })
 }
 
 export const Created = (response: Response, data: ResponseBody) => {
