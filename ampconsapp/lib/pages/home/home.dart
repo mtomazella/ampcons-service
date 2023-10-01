@@ -1,14 +1,12 @@
+import 'package:ampconsapp/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class HomePage extends StatelessWidget {
+  final User user;
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
+  const HomePage({super.key, required this.user});
 
-class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,7 +23,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[SfCartesianChart()],
         ),
       ),

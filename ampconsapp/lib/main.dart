@@ -1,12 +1,15 @@
+import 'package:ampconsapp/components/loading_page.dart';
 import 'package:ampconsapp/pages/config/config.dart';
 import 'package:ampconsapp/providers/config_notifier.dart';
 import 'package:ampconsapp/providers/config_provider.dart';
+import 'package:ampconsapp/providers/user_notifier.dart';
+import 'package:ampconsapp/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:ampconsapp/pages/home/home.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const App());
+  runApp(const AmpconsApp());
 }
 
 class AmpconsApp extends StatelessWidget {
@@ -16,6 +19,7 @@ class AmpconsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       ConfigProvider.getProvider(),
+      UserProvider.getProvider(),
     ], child: const App());
   }
 }
@@ -30,13 +34,39 @@ class App extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.yellow, brightness: Brightness.light),
-        // brightness: Brightness.light),
         useMaterial3: true,
       ),
       routes: <String, WidgetBuilder>{
-        '/config': (BuildContext context) => const ConfigPage(),
+        '/config': (BuildContext context) => Consumer<UserNotifier>(
+            builder: (context, userNotifier, _) => FutureBuilder(
+                  future: Provider.of<UserNotifier>(context, listen: false)
+                      .fetchUser(),
+                  builder: (context, snapshot) {
+                    try {
+                      return const ConfigPage();
+                    } catch (e) {
+                      return const LoadingPage();
+                    }
+                  },
+                )),
+        '/notFound': (context) {
+          return const Text('User not found');
+        }
       },
-      home: const HomePage(),
+      home: Consumer<UserNotifier>(
+        builder: (context, userNotifier, _) => FutureBuilder(
+          future: Provider.of<UserNotifier>(context, listen: false).fetchUser(),
+          builder: (context, snapshot) {
+            try {
+              return HomePage(
+                user: userNotifier.user,
+              );
+            } catch (e) {
+              return const LoadingPage();
+            }
+          },
+        ),
+      ),
     );
   }
 }
