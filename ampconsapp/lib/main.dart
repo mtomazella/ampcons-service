@@ -33,7 +33,10 @@ class App extends StatelessWidget {
       title: 'AMPCONS',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.yellow, brightness: Brightness.light),
+            seedColor: Colors.yellow,
+            brightness: (Provider.of<ConfigNotifier>(context).darkTheme)
+                ? Brightness.dark
+                : Brightness.light),
         useMaterial3: true,
       ),
       routes: <String, WidgetBuilder>{
@@ -43,7 +46,9 @@ class App extends StatelessWidget {
                       .fetchUser(),
                   builder: (context, snapshot) {
                     try {
-                      return const ConfigPage();
+                      return Consumer<ConfigNotifier>(
+                          builder: (context, configNotifier, _) =>
+                              ConfigPage(configNotifier: configNotifier));
                     } catch (e) {
                       return const LoadingPage();
                     }

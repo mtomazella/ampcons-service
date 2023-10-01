@@ -11,10 +11,10 @@ class UserDisplay extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CircleAvatar(
-            backgroundImage: const AssetImage('assets/user.png'),
+        const CircleAvatar(
+            backgroundImage: AssetImage('assets/user.png'),
             radius: 40,
-            backgroundColor: Theme.of(context).colorScheme.background),
+            backgroundColor: Colors.white),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 0, 0),
           child:

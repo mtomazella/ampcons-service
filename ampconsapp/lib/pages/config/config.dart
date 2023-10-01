@@ -1,16 +1,19 @@
 import 'package:ampconsapp/components/loading_page.dart';
 import 'package:ampconsapp/models/user.dart';
 import 'package:ampconsapp/pages/config/components/user_display.dart';
+import 'package:ampconsapp/providers/config_notifier.dart';
 import 'package:ampconsapp/providers/user_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ConfigPage extends StatelessWidget {
-  const ConfigPage({super.key});
+  final ConfigNotifier configNotifier;
+
+  const ConfigPage({super.key, required this.configNotifier});
 
   @override
   Widget build(BuildContext context) {
-    User? user = Provider.of<UserNotifier>(context, listen: false).user;
+    User? user = Provider.of<UserNotifier>(context).user;
 
     if (user == null) return const LoadingPage();
 
@@ -34,7 +37,18 @@ class ConfigPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text("Tema escuro", textScaleFactor: 1.5),
-                    Switch(value: true, onChanged: (bool state) => {})
+                    Switch(
+                        trackColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.selected)) {
+                            return Theme.of(context).colorScheme.primary;
+                          }
+                          return Theme.of(context).colorScheme.background;
+                        }),
+                        value: configNotifier.darkTheme,
+                        onChanged: (bool state) {
+                          configNotifier.darkTheme = state;
+                        })
                   ],
                 )
               ],
