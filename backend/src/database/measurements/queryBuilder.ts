@@ -5,13 +5,17 @@ export type InfluxDate = Date | 'now'
 export type InfluxDuration = string
 
 export class MeasurementQueryBuilder {
-  private sensorId: string | undefined
+  private measurementFields = ['current', 'tension']
+  private tagFields = ['sensor_id']
+
+  private sensorIds: string[] | undefined
   private timeLowerBound: InfluxDate | undefined
   private timeUpperBound: InfluxDate | undefined = 'now'
   private timeOffset: InfluxDuration | undefined = '-1d'
+  private useMean: boolean = false
 
-  useSensorId(sensorId: string) {
-    this.sensorId = sensorId
+  useSensorIds(sensorIds: string[]) {
+    this.sensorIds = sensorIds
     return this
   }
 
@@ -51,9 +55,19 @@ export class MeasurementQueryBuilder {
     return this
   }
 
-  buildTime() {
+  mean() {
+    this.useMean = true
+    return this
+  }
+
+  private buildTime() {
     if (this.timeUpperBound === 'now') return `range(start: ${this.timeOffset})`
     throw 'This time of time bound was not implemented yet'
+  }
+
+  private buildMean() {
+    if (!this.useMean) return null
+    return 'group(columns: ["_field"]) |> mean()'
   }
 
   build() {
@@ -64,6 +78,7 @@ export class MeasurementQueryBuilder {
     return `${[
       `from(bucket: "${globalConfig.BE_INFLUXDB_MEASUREMENTS_BUCKET}")`,
       this.buildTime(),
+      this.buildMean(),
     ]
       .filter(q => q !== null)
       .join('\n |> ')}`

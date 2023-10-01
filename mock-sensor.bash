@@ -6,7 +6,7 @@ current_random=0
 sensor_id=0
 speed=5
 
-while getopts u:t:c:r:R:i:s: flag
+while getopts u:t:c:r:R:i:S:s: flag
 do
     case "${flag}" in
         u) url=${OPTARG};;
