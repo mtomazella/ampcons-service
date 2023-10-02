@@ -9,9 +9,9 @@ class UserNotifier extends ChangeNotifier {
     try {
       User user = await HttpService.getUser('thisismia');
       _user = user;
-      return true;
+      return Future.value(true);
     } catch (error) {
-      return false;
+      return Future.error(error);
     }
   }
 

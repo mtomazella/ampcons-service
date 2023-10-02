@@ -1,5 +1,6 @@
 import 'package:ampconsapp/components/loading_page.dart';
 import 'package:ampconsapp/pages/config/config.dart';
+import 'package:ampconsapp/pages/error/error.dart';
 import 'package:ampconsapp/providers/config_notifier.dart';
 import 'package:ampconsapp/providers/config_provider.dart';
 import 'package:ampconsapp/providers/user_notifier.dart';
@@ -54,19 +55,41 @@ class App extends StatelessWidget {
                     }
                   },
                 )),
-        '/notFound': (context) {
-          return const Text('User not found');
-        }
+        '/error': (context) {
+          var modalRoute = ModalRoute.of(context);
+          var params = modalRoute == null
+              ? ErrorPageRouteParams()
+              : modalRoute.settings.arguments as ErrorPageRouteParams;
+          return ErrorPage(
+            title: params.title,
+            description: params.description,
+          );
+        },
       },
       home: Consumer<UserNotifier>(
         builder: (context, userNotifier, _) => FutureBuilder(
           future: Provider.of<UserNotifier>(context, listen: false).fetchUser(),
           builder: (context, snapshot) {
             try {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const LoadingPage();
+              }
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.hasError) {
+                Navigator.pushNamed(context, '/error',
+                    arguments: ErrorPageRouteParams(
+                        title: "Usuário Não Encontrado",
+                        description: [
+                          "Não foi possível buscar o usuário",
+                          "Cheque sua conexão à internet"
+                        ]));
+              }
               return HomePage(
                 user: userNotifier.user,
               );
             } catch (e) {
+              print(e);
+              Navigator.pushNamed(context, '/error');
               return const LoadingPage();
             }
           },
