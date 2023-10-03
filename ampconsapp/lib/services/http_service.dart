@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ampconsapp/models/measurement_summary.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:ampconsapp/models/user.dart';
@@ -18,5 +19,23 @@ class HttpService {
     return User(id: json['id'], name: json['name']
         // , sensorIds: json['sensorIds']
         );
+  }
+
+  static Future<MeasurementSummary> getSummary({required String userId}) async {
+    var summaryResponse =
+        await http.get(Uri.parse('$baseUrl/measurements/$userId/summary'));
+
+    if (summaryResponse.statusCode != 200) throw "Unknown";
+
+    double convertDouble(dynamic value) {
+      if (value is String) return double.parse(value);
+      if (value is int) return value.toDouble();
+      return value;
+    }
+
+    var json = jsonDecode(summaryResponse.body);
+    return MeasurementSummary(
+        tension: convertDouble(json['tension']),
+        current: convertDouble(json['current']));
   }
 }

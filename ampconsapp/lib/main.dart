@@ -3,6 +3,8 @@ import 'package:ampconsapp/pages/config/config.dart';
 import 'package:ampconsapp/pages/error/error.dart';
 import 'package:ampconsapp/providers/config_notifier.dart';
 import 'package:ampconsapp/providers/config_provider.dart';
+import 'package:ampconsapp/providers/measurements_notifier.dart';
+import 'package:ampconsapp/providers/measurements_provider.dart';
 import 'package:ampconsapp/providers/user_notifier.dart';
 import 'package:ampconsapp/providers/user_provider.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class AmpconsApp extends StatelessWidget {
     return MultiProvider(providers: [
       ConfigProvider.getProvider(),
       UserProvider.getProvider(),
+      MeasurementsProvider.getProvider(),
     ], child: const App());
   }
 }
@@ -84,9 +87,11 @@ class App extends StatelessWidget {
                           "Cheque sua conexão à internet"
                         ]));
               }
-              return HomePage(
-                user: userNotifier.user,
-              );
+              return Consumer<MeasurementsNotifier>(
+                  builder: (context, measurementsNotifier, _) => HomePage(
+                        user: userNotifier.user,
+                        measurementsNotifier: measurementsNotifier,
+                      ));
             } catch (e) {
               print(e);
               Navigator.pushNamed(context, '/error');
