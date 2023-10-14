@@ -22,7 +22,7 @@ export const getMeasurements = async (request: Request, response: Response) => {
     const { offset = '-1d' } = request.query
 
     const queryString = new MeasurementQueryBuilder()
-      .useTimeWithOffset({ fluxOffset: offset as string })
+      .rangeWithOffset({ fluxOffset: offset as string })
       .build()
     const queryResult = await query(queryString)
 

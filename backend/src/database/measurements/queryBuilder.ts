@@ -1,86 +1,108 @@
 import { ParameterizedQuery, flux } from '@influxdata/influxdb-client'
 import { globalConfig } from '../../config'
 
+export type MeasurementField = 'tension' | 'current'
+export type MeasurementTag = 'sensor_id'
+
 export type InfluxDate = Date | 'now'
 export type InfluxDuration = string
 
 export class MeasurementQueryBuilder {
-  private measurementFields = ['current', 'tension']
-  private tagFields = ['sensor_id']
+  private query: string[] = []
 
-  private sensorIds: string[] | undefined
-  private timeLowerBound: InfluxDate | undefined
+  private measurementFields: MeasurementField[] = ['current', 'tension']
+  private tagFields: MeasurementTag[] = ['sensor_id']
+
   private timeUpperBound: InfluxDate | undefined = 'now'
   private timeOffset: InfluxDuration | undefined = '-1d'
   private useMean: boolean = false
 
-  useSensorIds(sensorIds: string[]) {
-    this.sensorIds = sensorIds
+  filterSensorIds(sensorIds: string[]) {
+    throw 'Not Implemented'
     return this
   }
 
-  useTimeBounds({
-    timeLowerBound,
-    timeUpperBound,
-  }: {
-    timeLowerBound: InfluxDate
-    timeUpperBound: InfluxDate
-  }) {
-    this.timeOffset = undefined
-    this.timeLowerBound = timeLowerBound
-    this.timeUpperBound = timeUpperBound
-    return this
-  }
-
-  /**
-   * Offset is a duration in milliseconds
-   */
-  useTimeWithOffset({
-    timeLowerBound,
-    timeUpperBound,
+  rangeWithOffset({
     fluxOffset,
   }: {
-    timeLowerBound?: InfluxDate
-    timeUpperBound?: InfluxDate
+    // timeLowerBound?: InfluxDate
+    // timeUpperBound?: InfluxDate
     fluxOffset: InfluxDuration
   }) {
-    if (timeLowerBound && timeUpperBound)
-      throw 'Choose only one bound to define'
+    if (this.timeUpperBound === 'now')
+      this.query.push(`range(start: ${fluxOffset})`)
 
-    if (timeLowerBound) this.timeLowerBound = timeLowerBound
-    else if (timeUpperBound) this.timeUpperBound = timeUpperBound
+    return this
+  }
 
-    this.timeOffset = fluxOffset
-
+  group({ columns }: { columns: ('_field' | MeasurementTag)[] }) {
+    this.query.push(
+      `group(${
+        columns ? `columns: [${columns.map(c => `"${c}"`).join(', ')}]` : ''
+      })`,
+    )
     return this
   }
 
   mean() {
-    this.useMean = true
+    this.query.push('mean()')
     return this
   }
 
-  private buildTime() {
-    if (this.timeUpperBound === 'now') return `range(start: ${this.timeOffset})`
-    throw 'This time of time bound was not implemented yet'
+  sum() {
+    this.query.push('sum()')
+    return this
   }
 
-  private buildMean() {
-    if (!this.useMean) return null
-    return 'group(columns: ["_field"]) |> mean()'
+  filterFields(fields: MeasurementField[]) {
+    this.query.push(
+      `filter(fn: (r) => ${fields
+        .map(field => `r._field == "${field}"`)
+        .join(' or ')})`,
+    )
+    return this
   }
 
   build() {
-    // return `
-    //   from(bucket: "measurements")
-    // |> range(start: -1d)
-    //   `
     return `${[
       `from(bucket: "${globalConfig.BE_INFLUXDB_MEASUREMENTS_BUCKET}")`,
-      this.buildTime(),
-      this.buildMean(),
+      ...this.query,
     ]
       .filter(q => q !== null)
       .join('\n |> ')}`
   }
+}
+
+export const buildSummaryQuery = ({
+  timeOffset = '-1m',
+}: {
+  timeOffset?: string
+}) => {
+  return `
+    data = from(bucket: "${globalConfig.BE_INFLUXDB_MEASUREMENTS_BUCKET}")
+      |> range(start: ${timeOffset})
+      |> aggregateWindow(every: 1s, fn: mean, createEmpty: false)
+
+    data
+      |> filter(fn: (r) => r["_field"] == "current")
+      |> group(columns: ["_field", "sensor_id"])
+      |> mean()
+      |> group(columns: ["_field"])
+      |> sum()
+      |> map(fn: (r) => ({ r with current: r["_value"]}))
+      |> drop(columns: ["_field", "_value"])
+      |> yield(name: "current")
+
+    data
+      |> filter(fn: (r) => r["_field"] == "current" or r["_field"] == "tension")
+      |> group(columns: ["_time", "sensor_id"])
+      |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+      |> map(fn: (r) => ({ r with power: r.current * r.tension }))
+      |> aggregateWindow(every: 1d, column: "power", fn: mean)
+      |> group(columns: ["sensor_id"])
+      |> mean(column: "power")
+      |> group()
+      |> sum(column: "power")
+      |> yield(name: "mean")
+  `
 }
