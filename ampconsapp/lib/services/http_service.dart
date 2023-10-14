@@ -6,8 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:ampconsapp/models/user.dart';
 
 class HttpService {
-  // static String baseUrl = 'http://192.168.15.8:3001';
-  static String baseUrl = 'http://172.26.97.101:3001';
+  static String baseUrl = 'http://192.168.15.8:3001';
+  // static String baseUrl = 'http://172.26.97.101:3001';
+  // static String baseUrl = 'http://172.26.97.101:3001';
 
   static Future<User> getUser(String userId) async {
     var userResponse = await http.get(Uri.parse('$baseUrl/user/$userId'));
@@ -25,9 +26,15 @@ class HttpService {
     var summaryResponse =
         await http.get(Uri.parse('$baseUrl/measurements/$userId/summary'));
 
+    if (summaryResponse.statusCode == 204) {
+      return MeasurementSummary(
+          power: double.negativeInfinity, current: double.negativeInfinity);
+    }
+
     if (summaryResponse.statusCode != 200) throw "Unknown";
 
     double convertDouble(dynamic value) {
+      if (value == null) return double.negativeInfinity;
       if (value is String) return double.parse(value);
       if (value is int) return value.toDouble();
       return value;
@@ -35,7 +42,7 @@ class HttpService {
 
     var json = jsonDecode(summaryResponse.body);
     return MeasurementSummary(
-        tension: convertDouble(json['tension']),
+        power: convertDouble(json['power']),
         current: convertDouble(json['current']));
   }
 }

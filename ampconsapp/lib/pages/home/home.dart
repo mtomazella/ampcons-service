@@ -46,20 +46,19 @@ class HomePage extends StatelessWidget {
               children: <Widget>[
                 SfCartesianChart(),
                 SummaryItem(
-                  icon: Icons.bolt,
-                  color: Colors.orange,
-                  label: "Tensão",
-                  value:
-                      measurementsNotifier.summary?.tension.toStringAsFixed(2),
-                  unit: "V",
-                ),
-                SummaryItem(
-                    icon: Icons.battery_full,
+                    icon: Icons.bolt,
                     color: Colors.indigo,
                     label: "Corrente",
                     value: measurementsNotifier.summary?.current
                         .toStringAsFixed(2),
-                    unit: "A")
+                    unit: "A"),
+                SummaryItem(
+                  icon: Icons.electrical_services,
+                  color: Colors.deepPurple,
+                  label: "Potência",
+                  value: measurementsNotifier.summary?.power.toStringAsFixed(2),
+                  unit: "W",
+                ),
               ],
             ),
           ),

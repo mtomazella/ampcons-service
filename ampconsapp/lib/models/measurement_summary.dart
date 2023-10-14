@@ -1,6 +1,6 @@
 class MeasurementSummary {
-  final double tension;
+  final double power;
   final double current;
 
-  MeasurementSummary({required this.tension, required this.current});
+  MeasurementSummary({required this.power, required this.current});
 }
