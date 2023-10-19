@@ -1,12 +1,15 @@
 class Measurement {
+  late String time;
   late double tension;
   late double current;
   late double power;
 
-  Measurement({required double tension, required double current});
+  Measurement(
+      {required this.time, required this.tension, required this.current});
 
   Measurement.withPower(
-      {required double tension,
-      required double current,
-      required double power});
+      {required this.time,
+      required this.tension,
+      required this.current,
+      required this.power});
 }

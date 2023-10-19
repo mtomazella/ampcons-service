@@ -106,3 +106,20 @@ export const buildSummaryQuery = ({
       |> yield(name: "mean")
   `
 }
+
+export const buildPointGatherQuery = ({
+  timeOffset = '-1d',
+  aggregationInterval = '1m'
+}: {
+  timeOffset?: string
+  aggregationInterval?: string
+}) => {
+  return `
+    from(bucket: "${globalConfig.BE_INFLUXDB_MEASUREMENTS_BUCKET}")
+      |> range(start: ${timeOffset})
+      |> group(columns: ["_field"])
+      |> aggregateWindow(every: ${aggregationInterval}, fn: mean, createEmpty: false)
+      |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")
+      |> map(fn: (r) => ({ r with power: r.tension * r.current}))
+  `
+}

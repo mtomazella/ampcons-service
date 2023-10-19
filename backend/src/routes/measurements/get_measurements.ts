@@ -8,9 +8,7 @@ import {
 import { buildMissingParamErrorString } from '../../utils/string_builders'
 import { query } from '../../database/influx'
 import {
-  MeasurementQueryBuilder,
-  RawRecord,
-  aggregatePointsMapper,
+  buildPointGatherQuery,
 } from '../../database/measurements'
 
 export const getMeasurements = async (request: Request, response: Response) => {
@@ -21,13 +19,11 @@ export const getMeasurements = async (request: Request, response: Response) => {
 
     const { offset = '-1d' } = request.query
 
-    const queryString = new MeasurementQueryBuilder()
-      .rangeWithOffset({ fluxOffset: offset as string })
-      .build()
+    const queryString = buildPointGatherQuery({ timeOffset: offset as string })
     const queryResult = await query(queryString)
 
     return Success(response, {
-      data: aggregatePointsMapper(queryResult as RawRecord[]) ?? [],
+        data: (queryResult as Record<string, any>[]).map(({ _time, table, result, _start, _stop, ...other }) => ({ time: _time, ...other }))
     })
   } catch (error) {
     return InternalServerError(response, error)

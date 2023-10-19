@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:ampconsapp/components/stateful_wrapper.dart';
+import 'package:ampconsapp/models/measurement.dart';
 import 'package:ampconsapp/models/user.dart';
 import 'package:ampconsapp/pages/home/components/summary_item.dart';
 import 'package:ampconsapp/providers/measurements_notifier.dart';
@@ -23,6 +24,7 @@ class HomePage extends StatelessWidget {
           measurementsTimer =
               Timer.periodic(const Duration(seconds: 5), (timer) {
             measurementsNotifier.updateSummary();
+            measurementsNotifier.updateMeasurementList();
           });
         },
         onDeactivate: () {
@@ -44,7 +46,14 @@ class HomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                SfCartesianChart(),
+                SfCartesianChart(primaryXAxis: CategoryAxis(), series: [
+                  LineSeries(
+                      dataSource: measurementsNotifier.measurementList,
+                      xValueMapper: (Measurement measurement, _) =>
+                          measurement.time,
+                      yValueMapper: (Measurement measurement, _) =>
+                          measurement.power),
+                ]),
                 SummaryItem(
                     icon: Icons.bolt,
                     color: Colors.indigo,

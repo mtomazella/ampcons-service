@@ -1,14 +1,15 @@
 import 'dart:convert';
 
+import 'package:ampconsapp/models/measurement.dart';
 import 'package:ampconsapp/models/measurement_summary.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:ampconsapp/models/user.dart';
 
 class HttpService {
-  static String baseUrl = 'http://192.168.15.8:3001';
+  // static String baseUrl = 'http://192.168.15.8:3001';
   // static String baseUrl = 'http://172.26.97.101:3001';
-  // static String baseUrl = 'http://172.26.97.101:3001';
+  static String baseUrl = 'http://172.28.240.101:3001';
 
   static Future<User> getUser(String userId) async {
     var userResponse = await http.get(Uri.parse('$baseUrl/user/$userId'));
@@ -44,5 +45,38 @@ class HttpService {
     return MeasurementSummary(
         power: convertDouble(json['power']),
         current: convertDouble(json['current']));
+  }
+
+  static Future<List<Measurement>> getMeasurements(
+      {required String userId}) async {
+    var summaryResponse =
+        await http.get(Uri.parse('$baseUrl/measurements/$userId'));
+
+    if (summaryResponse.statusCode == 204) {
+      return Future.value([]);
+    }
+
+    if (summaryResponse.statusCode != 200) Future.error('Unknown');
+
+    double convertDouble(dynamic value) {
+      if (value == null) return double.negativeInfinity;
+      if (value is String) return double.parse(value);
+      if (value is int) return value.toDouble();
+      return value;
+    }
+
+    String convertTime(dynamic value) {
+      if (value == null) return '';
+      return value.toString();
+    }
+
+    Map<String, dynamic> json = jsonDecode(summaryResponse.body);
+    // return [Measurement(time: '', tension: 10, current: 2)];
+    return List.from((json['data'] as List<dynamic>).map((e) =>
+        Measurement.withPower(
+            time: convertTime(e['time']),
+            tension: convertDouble(e['tension']),
+            current: convertDouble(e['current']),
+            power: convertDouble(e['power']))));
   }
 }
