@@ -109,7 +109,7 @@ export const buildSummaryQuery = ({
 
 export const buildPointGatherQuery = ({
   timeOffset = '-1d',
-  aggregationInterval = '1m'
+  aggregationInterval = '1m',
 }: {
   timeOffset?: string
   aggregationInterval?: string

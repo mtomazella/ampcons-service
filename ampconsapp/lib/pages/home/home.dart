@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ampconsapp/components/stateful_wrapper.dart';
 import 'package:ampconsapp/models/measurement.dart';
 import 'package:ampconsapp/models/user.dart';
+import 'package:ampconsapp/pages/home/components/sensor_list.dart';
 import 'package:ampconsapp/pages/home/components/summary_item.dart';
 import 'package:ampconsapp/providers/measurements_notifier.dart';
 import 'package:flutter/material.dart';
@@ -43,8 +44,7 @@ class HomePage extends StatelessWidget {
             ],
           ),
           body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+            child: ListView(
               children: <Widget>[
                 SfCartesianChart(primaryXAxis: CategoryAxis(), series: [
                   LineSeries(
@@ -68,6 +68,9 @@ class HomePage extends StatelessWidget {
                   value: measurementsNotifier.summary?.power.toStringAsFixed(2),
                   unit: "W",
                 ),
+                SensorList(
+                  user: user,
+                )
               ],
             ),
           ),

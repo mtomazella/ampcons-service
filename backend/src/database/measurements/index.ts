@@ -7,3 +7,4 @@ export type RawRecord = {
 
 export * from './queryBuilder'
 export * from './mappers'
+export * from './functions'

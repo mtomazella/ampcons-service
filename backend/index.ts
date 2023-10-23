@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import { initConfiguration } from './src/config'
 import { router as measurementsRouter } from './src/routes/measurements'
 import { router as userRouter } from './src/routes/users'
+import { router as sensorRouter } from './src/routes/sensors'
 
 initConfiguration()
 
@@ -18,5 +19,6 @@ app
   })
   .use('/measurements', measurementsRouter)
   .use('/user', userRouter)
+  .use('/sensor', sensorRouter)
 
 app.listen(3001, () => console.log('Server up'))

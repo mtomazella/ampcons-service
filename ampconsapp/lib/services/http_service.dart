@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:ampconsapp/models/measurement.dart';
 import 'package:ampconsapp/models/measurement_summary.dart';
+import 'package:ampconsapp/models/sensor.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:ampconsapp/models/user.dart';
@@ -71,12 +72,26 @@ class HttpService {
     }
 
     Map<String, dynamic> json = jsonDecode(summaryResponse.body);
-    // return [Measurement(time: '', tension: 10, current: 2)];
     return List.from((json['data'] as List<dynamic>).map((e) =>
         Measurement.withPower(
             time: convertTime(e['time']),
             tension: convertDouble(e['tension']),
             current: convertDouble(e['current']),
             power: convertDouble(e['power']))));
+  }
+
+  static Future<List<Sensor>> getUserSensors({required String userId}) async {
+    var response = await http.get(Uri.parse('$baseUrl/sensor/user/$userId'));
+
+    if (response.statusCode == 204) {
+      return Future.value([]);
+    }
+
+    if (response.statusCode != 200) Future.error('Unknown');
+
+    Map<String, dynamic> json = jsonDecode(response.body);
+    return List.from((json['data'] as List<dynamic>).map((e) {
+      return Sensor(id: e['id'], name: e['name']);
+    }));
   }
 }

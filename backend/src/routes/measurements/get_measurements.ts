@@ -8,6 +8,7 @@ import {
 import { buildMissingParamErrorString } from '../../utils/string_builders'
 import { query } from '../../database/influx'
 import {
+  autodefineAggregationInterval,
   buildPointGatherQuery,
 } from '../../database/measurements'
 
@@ -17,13 +18,24 @@ export const getMeasurements = async (request: Request, response: Response) => {
     if (hasError)
       return BadRequest(response, buildMissingParamErrorString(missing))
 
-    const { offset = '-1d' } = request.query
+    const { offset = '-1d', interval } = request.query
 
-    const queryString = buildPointGatherQuery({ timeOffset: offset as string })
+    const queryString = buildPointGatherQuery({
+      timeOffset: offset as string,
+      aggregationInterval:
+        (interval as string) ??
+        autodefineAggregationInterval({ offset: offset as string }),
+    })
     const queryResult = await query(queryString)
 
     return Success(response, {
-        data: (queryResult as Record<string, any>[]).map(({ _time, table, result, _start, _stop, ...other }) => ({ time: _time, ...other }))
+      data: (queryResult as Record<string, any>[]).map(
+        ({ _time, table, result, _start, _stop, ...other }) => ({
+          time: _time,
+          displayTime: new Date(_time).toLocaleDateString(),
+          ...other,
+        }),
+      ),
     })
   } catch (error) {
     return InternalServerError(response, error)
