@@ -11,6 +11,14 @@ import {
   autodefineAggregationInterval,
   buildPointGatherQuery,
 } from '../../database/measurements'
+import { StringList } from '../../types/requests'
+import { parseStringList } from '../../utils/string_parsers'
+
+type RequestQuery = {
+  offset: string | undefined
+  interval: string | undefined
+  sensorIds: StringList | undefined
+}
 
 export const getMeasurements = async (request: Request, response: Response) => {
   try {
@@ -18,13 +26,15 @@ export const getMeasurements = async (request: Request, response: Response) => {
     if (hasError)
       return BadRequest(response, buildMissingParamErrorString(missing))
 
-    const { offset = '-1d', interval } = request.query
+    const { offset, interval, sensorIds } = parseParameters(
+      request.query as RequestQuery,
+    )
 
     const queryString = buildPointGatherQuery({
       timeOffset: offset as string,
       aggregationInterval:
-        (interval as string) ??
-        autodefineAggregationInterval({ offset: offset as string }),
+        interval ?? autodefineAggregationInterval({ offset: offset as string }),
+      sensorIds,
     })
     const queryResult = await query(queryString)
 
@@ -39,5 +49,14 @@ export const getMeasurements = async (request: Request, response: Response) => {
     })
   } catch (error) {
     return InternalServerError(response, error)
+  }
+}
+
+const parseParameters = (params: RequestQuery | undefined) => {
+  const { offset, sensorIds, interval } = params ?? {}
+  return {
+    offset: offset ?? '-1m',
+    sensorIds: parseStringList(sensorIds),
+    interval: interval ?? '1m',
   }
 }

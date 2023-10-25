@@ -1,0 +1,1 @@
+export type StringList = string

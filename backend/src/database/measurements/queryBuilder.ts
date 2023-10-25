@@ -75,12 +75,21 @@ export class MeasurementQueryBuilder {
 
 export const buildSummaryQuery = ({
   timeOffset = '-1m',
+  sensorIds = [],
 }: {
   timeOffset?: string
+  sensorIds?: string[]
 }) => {
   return `
     data = from(bucket: "${globalConfig.BE_INFLUXDB_MEASUREMENTS_BUCKET}")
       |> range(start: ${timeOffset})
+      ${
+        sensorIds.length === 0
+          ? ''
+          : ` |> filter(fn: (r) => ${sensorIds
+              .map(id => `r["sensor_id"] == "${id}"`)
+              .join(' or ')})`
+      }
       |> aggregateWindow(every: 1s, fn: mean, createEmpty: false)
 
     data
@@ -110,13 +119,22 @@ export const buildSummaryQuery = ({
 export const buildPointGatherQuery = ({
   timeOffset = '-1d',
   aggregationInterval = '1m',
+  sensorIds = [],
 }: {
   timeOffset?: string
   aggregationInterval?: string
+  sensorIds?: string[]
 }) => {
   return `
     from(bucket: "${globalConfig.BE_INFLUXDB_MEASUREMENTS_BUCKET}")
       |> range(start: ${timeOffset})
+      ${
+        sensorIds.length === 0
+          ? ''
+          : ` |> filter(fn: (r) => ${sensorIds
+              .map(id => `r["sensor_id"] == "${id}"`)
+              .join(' or ')})`
+      }
       |> group(columns: ["_field"])
       |> aggregateWindow(every: ${aggregationInterval}, fn: mean, createEmpty: false)
       |> pivot(rowKey: ["_time"], columnKey: ["_field"], valueColumn: "_value")

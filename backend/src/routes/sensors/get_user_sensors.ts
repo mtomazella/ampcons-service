@@ -11,7 +11,7 @@ import { getUser as getUserDB } from '../../database/users'
 import { getSensorList } from '../../database/sensors'
 import { isEmpty } from 'lodash'
 
-export const getSensors = async (request: Request, response: Response) => {
+export const getUserSensors = async (request: Request, response: Response) => {
   try {
     const { hasError, missing } = validateParameters(request.params, ['userId'])
     if (hasError)

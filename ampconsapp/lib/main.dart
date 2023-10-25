@@ -1,6 +1,7 @@
 import 'package:ampconsapp/components/loading_page.dart';
 import 'package:ampconsapp/pages/config/config.dart';
 import 'package:ampconsapp/pages/error/error.dart';
+import 'package:ampconsapp/pages/sensor/sensor.dart';
 import 'package:ampconsapp/providers/config_notifier.dart';
 import 'package:ampconsapp/providers/config_provider.dart';
 import 'package:ampconsapp/providers/measurements_notifier.dart';
@@ -43,6 +44,7 @@ class App extends StatelessWidget {
                 : Brightness.light),
         useMaterial3: true,
       ),
+      initialRoute: '/home',
       routes: <String, WidgetBuilder>{
         '/config': (BuildContext context) => Consumer<UserNotifier>(
             builder: (context, userNotifier, _) => FutureBuilder(
@@ -68,38 +70,87 @@ class App extends StatelessWidget {
             description: params.description,
           );
         },
+        '/home': (context) {
+          return Consumer<UserNotifier>(
+            builder: (context, userNotifier, _) => FutureBuilder(
+              future:
+                  Provider.of<UserNotifier>(context, listen: false).fetchUser(),
+              builder: (context, snapshot) {
+                try {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const LoadingPage();
+                  }
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasError) {
+                    Navigator.pushNamed(context, '/error',
+                        arguments: ErrorPageRouteParams(
+                            title: "Usuário Não Encontrado",
+                            description: [
+                              "Não foi possível buscar o usuário",
+                              "Cheque sua conexão à internet"
+                            ]));
+                  }
+                  return Consumer<MeasurementsNotifier>(
+                      builder: (context, measurementsNotifier, _) => HomePage(
+                            user: userNotifier.user,
+                            measurementsNotifier: measurementsNotifier,
+                          ));
+                } catch (e) {
+                  print(e);
+                  Navigator.pushNamed(context, '/error');
+                  return const LoadingPage();
+                }
+              },
+            ),
+          );
+        },
+        '/sensor': (context) {
+          var modalRoute = ModalRoute.of(context);
+
+          if (modalRoute == null || modalRoute.settings.arguments == null) {
+            Navigator.pushNamed(context, '/error',
+                arguments: ErrorPageRouteParams(
+                    title: 'Sensor Inválido', description: []));
+          }
+
+          var params = modalRoute?.settings.arguments as SensorPageRouteParams;
+          // var params = SensorPageRouteParams(id: '0');
+
+          return Consumer<UserNotifier>(
+            builder: (context, userNotifier, _) => FutureBuilder(
+              future:
+                  Provider.of<UserNotifier>(context, listen: false).fetchUser(),
+              builder: (context, snapshot) {
+                try {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const LoadingPage();
+                  }
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasError) {
+                    Navigator.pushNamed(context, '/error',
+                        arguments: ErrorPageRouteParams(
+                            title: "Usuário Não Encontrado",
+                            description: [
+                              "Não foi possível buscar o usuário",
+                              "Cheque sua conexão à internet"
+                            ]));
+                  }
+                  return Consumer<MeasurementsNotifier>(
+                      builder: (context, measurementsNotifier, _) => SensorPage(
+                            id: params.id,
+                            user: userNotifier.user,
+                            measurementsNotifier: measurementsNotifier,
+                          ));
+                } catch (e) {
+                  print(e);
+                  Navigator.pushNamed(context, '/error');
+                  return const LoadingPage();
+                }
+              },
+            ),
+          );
+        }
       },
-      home: Consumer<UserNotifier>(
-        builder: (context, userNotifier, _) => FutureBuilder(
-          future: Provider.of<UserNotifier>(context, listen: false).fetchUser(),
-          builder: (context, snapshot) {
-            try {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const LoadingPage();
-              }
-              if (snapshot.connectionState == ConnectionState.done &&
-                  snapshot.hasError) {
-                Navigator.pushNamed(context, '/error',
-                    arguments: ErrorPageRouteParams(
-                        title: "Usuário Não Encontrado",
-                        description: [
-                          "Não foi possível buscar o usuário",
-                          "Cheque sua conexão à internet"
-                        ]));
-              }
-              return Consumer<MeasurementsNotifier>(
-                  builder: (context, measurementsNotifier, _) => HomePage(
-                        user: userNotifier.user,
-                        measurementsNotifier: measurementsNotifier,
-                      ));
-            } catch (e) {
-              print(e);
-              Navigator.pushNamed(context, '/error');
-              return const LoadingPage();
-            }
-          },
-        ),
-      ),
     );
   }
 }

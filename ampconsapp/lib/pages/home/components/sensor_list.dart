@@ -1,5 +1,6 @@
 import 'package:ampconsapp/models/sensor.dart';
 import 'package:ampconsapp/models/user.dart';
+import 'package:ampconsapp/pages/sensor/sensor.dart';
 import 'package:ampconsapp/services/http_service.dart';
 import 'package:flutter/material.dart';
 
@@ -56,7 +57,10 @@ class _SensorListState extends State<SensorList> {
               ...sensors
                   .map(
                     (e) => ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, '/sensor',
+                            arguments: SensorPageRouteParams(id: e.id));
+                      },
                       title: Text(e.name, style: const TextStyle(fontSize: 20)),
                       leading: Icon(
                         IconData(e.icon ?? Icons.sensors.codePoint,

@@ -10,10 +10,10 @@ import 'package:ampconsapp/models/user.dart';
 class HttpService {
   // static String baseUrl = 'http://192.168.15.8:3001';
   // static String baseUrl = 'http://172.26.97.101:3001';
-  static String baseUrl = 'http://172.28.240.101:3001';
+  static String baseUrl = '172.28.240.101:3001';
 
   static Future<User> getUser(String userId) async {
-    var userResponse = await http.get(Uri.parse('$baseUrl/user/$userId'));
+    var userResponse = await http.get(Uri.http(baseUrl, 'user/$userId'));
 
     if (userResponse.statusCode == 204) throw "NotFound";
     if (userResponse.statusCode != 200) throw "Unknown";
@@ -24,9 +24,12 @@ class HttpService {
         );
   }
 
-  static Future<MeasurementSummary> getSummary({required String userId}) async {
-    var summaryResponse =
-        await http.get(Uri.parse('$baseUrl/measurements/$userId/summary'));
+  static Future<MeasurementSummary> getSummary(
+      {required String userId, List<String>? sensorIds}) async {
+    var summaryResponse = await http.get(
+      Uri.http(baseUrl, 'measurements/$userId/summary',
+          {'sensorIds': (sensorIds ?? []).join(',')}),
+    );
 
     if (summaryResponse.statusCode == 204) {
       return MeasurementSummary(
@@ -49,9 +52,11 @@ class HttpService {
   }
 
   static Future<List<Measurement>> getMeasurements(
-      {required String userId}) async {
-    var summaryResponse =
-        await http.get(Uri.parse('$baseUrl/measurements/$userId'));
+      {required String userId, List<String>? sensorIds}) async {
+    var summaryResponse = await http.get(
+      Uri.http(baseUrl, 'measurements/$userId',
+          {'sensorIds': (sensorIds ?? []).join(',')}),
+    );
 
     if (summaryResponse.statusCode == 204) {
       return Future.value([]);
@@ -81,7 +86,7 @@ class HttpService {
   }
 
   static Future<List<Sensor>> getUserSensors({required String userId}) async {
-    var response = await http.get(Uri.parse('$baseUrl/sensor/user/$userId'));
+    var response = await http.get(Uri.http(baseUrl, 'sensor/user/$userId'));
 
     if (response.statusCode == 204) {
       return Future.value([]);
@@ -93,5 +98,20 @@ class HttpService {
     return List.from((json['data'] as List<dynamic>).map((e) {
       return Sensor(id: e['id'], name: e['name']);
     }));
+  }
+
+  static Future<Sensor> getSensor({required String sensorId}) async {
+    var response = await http.get(Uri.http(baseUrl, 'sensor/$sensorId'));
+
+    if (response.statusCode == 204) {
+      return Future.error('Not found');
+    }
+
+    if (response.statusCode != 200) Future.error('Unknown');
+
+    Map<String, dynamic> json = jsonDecode(response.body);
+    var data = json['data'];
+
+    return Sensor(id: data['id'], name: data['name']);
   }
 }

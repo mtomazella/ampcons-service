@@ -63,6 +63,10 @@ export const getSensors = async () => {
   }
 }
 
+export const getSensor = async (sensorId: string) => {
+  return ((await getSensors()) as Record<string, any>)[sensorId] ?? null
+}
+
 export const getSensorList = async (sensorIds: string[]) => {
   const sensors = (await getSensors()) as Record<string, any>
   return sensorIds.map(id => sensors[id])
