@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express'
+import cors from 'cors'
 import { initConfiguration } from './src/config'
 import { router as measurementsRouter } from './src/routes/measurements'
 import { router as userRouter } from './src/routes/users'
@@ -9,6 +10,7 @@ initConfiguration()
 const app = express()
 
 app.use(express.json())
+app.use(cors())
 
 app
   .get('/ping', (req: Request, res: Response) => {

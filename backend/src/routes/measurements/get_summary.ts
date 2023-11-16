@@ -8,7 +8,10 @@ import {
 } from '../../utils/response_builder'
 import { buildMissingParamErrorString } from '../../utils/string_builders'
 import { query } from '../../database/influx'
-import { buildSummaryQuery } from '../../database/measurements'
+import {
+  buildPowerOfMonthQuery,
+  buildSummaryQuery,
+} from '../../database/measurements'
 import { isEmpty, omit } from 'lodash'
 import { StringList } from '../../types/requests'
 import { parseStringList } from '../../utils/string_parsers'
@@ -32,20 +35,45 @@ export const getSummary = async (request: Request, response: Response) => {
       request.query as RequestQuery,
     )
 
-    const queryString = buildSummaryQuery({ timeOffset: offset, sensorIds })
-    // return Success(response, { queryString })
+    const queryString = buildSummaryQuery({
+      timeOffset: offset,
+      sensorIds,
+    })
     const queryResult = await query(queryString)
 
-    const summaryResults = (
-      queryResult as { result: string; [key: string]: any }[]
+    // return Success(response, { queryResult })
+
+    const summaryResults = { current: -1, power: -1 }
+    ;(queryResult as Record<string, any>[]).forEach(element => {
+      if (element.result === 'current') summaryResults.current = element.current
+      if (element.result === 'mean' && element._field === 'power')
+        summaryResults.power = element._value
+    })
+
+    const monthResults = (
+      (await query(buildPowerOfMonthQuery({ sensorIds }))) as Record<
+        string,
+        any
+      >[]
     ).reduce(
-      (current, item) => ({ ...omit(item, ['table', 'result']), ...current }),
-      {},
+      (current, element) => {
+        if (element.result === 'graph') {
+          current.points.push(element)
+          return current
+        }
+        if (element.result === 'absolute') {
+          current.total = element._value
+          return current
+        }
+        return current
+      },
+      { points: [], total: -1 },
     )
+
     if (isEmpty(summaryResults)) return NoContent(response)
     return Success(
       response,
-      summaryResults,
+      { ...summaryResults, monthConsumption: monthResults.total },
       // queryResult as Record<string, any>[]
     )
   } catch (error) {

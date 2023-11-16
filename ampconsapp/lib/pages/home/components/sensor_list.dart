@@ -6,8 +6,17 @@ import 'package:flutter/material.dart';
 
 class SensorList extends StatefulWidget {
   final User user;
+  late Function onTapSensor;
 
-  const SensorList({super.key, required this.user});
+  SensorList({super.key, required this.user, Function? onTapSensor}) {
+    if (onTapSensor != null) {
+      this.onTapSensor = onTapSensor;
+    } else {
+      this.onTapSensor = (BuildContext context, Sensor sensor) =>
+          Navigator.pushNamed(context, '/sensor',
+              arguments: SensorPageRouteParams(id: sensor.id));
+    }
+  }
 
   @override
   State<SensorList> createState() => _SensorListState();
@@ -58,8 +67,7 @@ class _SensorListState extends State<SensorList> {
                   .map(
                     (e) => ListTile(
                       onTap: () {
-                        Navigator.pushNamed(context, '/sensor',
-                            arguments: SensorPageRouteParams(id: e.id));
+                        widget.onTapSensor(context, e);
                       },
                       title: Text(e.name, style: const TextStyle(fontSize: 20)),
                       leading: Icon(

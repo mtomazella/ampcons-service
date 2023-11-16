@@ -22,7 +22,7 @@ class SensorInformation extends StatelessWidget {
         ]),
         SummaryItem(
             icon: Icons.bolt,
-            color: Colors.indigo,
+            color: Color(0xFF3F51B5),
             label: "Corrente",
             value: measurementsNotifier.summary?.current.toStringAsFixed(2),
             unit: "A"),

@@ -43,13 +43,17 @@ class SummaryItem extends StatelessWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              value ?? "??",
-                              style: textStyle.copyWith(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.w500),
-                            ),
+                            value == null
+                                ? const CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Text(
+                                    value ?? "??",
+                                    style: textStyle.copyWith(
+                                        color: Colors.white,
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.w500),
+                                  ),
                             Container(
                               width: 5,
                             ),

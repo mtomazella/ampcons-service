@@ -52,11 +52,11 @@ class _SensorPageState extends State<SensorPage> {
   void initState() {
     super.initState();
 
-    loadSensorData();
-
     measurementsTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       requestMeasurementsUpdate();
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) => loadSensorData());
   }
 
   @override
