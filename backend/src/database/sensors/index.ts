@@ -1,5 +1,9 @@
 export const getSensors = async () => {
   return {
+    '9C:9C:1F:CA:23:70': {
+        id: '9C:9C:1F:CA:23:70',
+        name: 'Sensor Real'
+    },
     0: {
       id: '0',
       name: 'Sensor 1',

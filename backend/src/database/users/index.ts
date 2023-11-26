@@ -3,7 +3,7 @@ export const getUsers = async () => {
     {
       id: 'thisismia',
       name: 'Mia',
-      sensorIds: ['0', '1', '2'],
+      sensorIds: ['0', '1', '2', '9C:9C:1F:CA:23:70'],
     },
   ]
 }
