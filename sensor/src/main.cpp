@@ -9,9 +9,13 @@
 #define ADS_VOLTAGE_CHANNEL 1
 #define CALIBRATION_TIME_MS 10000
 
-const char *NETWORK_SSID = "A";
-const char *NETWORK_PASSWORD = "A216191310";
-const char *MEASUREMENTS_API_URL = "http://192.168.15.9:3001/measurements";
+const char *NETWORK_SSID = "AMPCONS";
+const char *NETWORK_PASSWORD = "aaaaaaaa";
+// const char *MEASUREMENTS_API_URL = "http://192.168.15.9:3001/measurements";
+
+// const char *NETWORK_SSID = "M";
+// const char *NETWORK_PASSWORD = "gamerule";
+const char *MEASUREMENTS_API_URL = "http://192.168.0.10:3001/measurements";
 
 float voltageMovAverageVector[MOVING_AVG_SAMPLE_SIZE];
 int voltageMovAverageIndex = 0;
@@ -133,7 +137,7 @@ float getCalibrationConstant(int channel, float *vector, int *index, int calibra
 DataPoint sampleDataPoint()
 {
   DataPoint data;
-  float current = (readSensor(ADS_CURRENT_CHANNEL, currentMovAverageVector, &currentMovAverageIndex, currentCalibrationConstant)) * 0.00199025;
+  float current = (readSensor(ADS_CURRENT_CHANNEL, currentMovAverageVector, &currentMovAverageIndex, currentCalibrationConstant)) * 0.0037623;
   float voltage = (readSensorRMS(ADS_VOLTAGE_CHANNEL, voltageMovAverageVector, &voltageMovAverageIndex, 0));
   data.current = current;
   data.tension = voltage;
@@ -148,7 +152,7 @@ void postDataPoint(DataPoint data)
     http.begin(MEASUREMENTS_API_URL);
     http.addHeader("Content-Type", "application/json");
     char json[100];
-    sprintf(json, "{\"tension\": %.4f, \"current\": %.4f, \"sensor_id\": \"%s\"}", data.tension, data.current, WiFi.macAddress().c_str());
+    sprintf(json, "{\"tension\": %.4f, \"current\": %.4f, \"sensor_id\": \"9C:9C:1F:CA:23:70\"}", data.tension, data.current);
     Serial.println(json);
     int httpCode = http.POST(json);
 

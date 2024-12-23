@@ -7,7 +7,7 @@ export const autodefineAggregationInterval = ({
   if (lowerOffset.includes('y')) return '1m'
   if (lowerOffset.includes('mo')) return '1d'
   if (lowerOffset.includes('w')) return '1d'
-  if (lowerOffset.includes('d')) return '15m'
+  if (lowerOffset.includes('d')) return '1h'
   if (lowerOffset.includes('h')) return '1m'
   return '1s'
 }
